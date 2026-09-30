@@ -10,7 +10,7 @@ describe('schemaAllowlist', () => {
 		expect(schemaAllowlist('clickhouse', { databases: ['db'] })).toEqual(['db']);
 	});
 
-	it.each(['fabric', 'databricks', 'motherduck'] as const)('uses %s schemas as-is', (mode) => {
+	it.each(['fabric', 'databricks', 'motherduck', 'duckdb'] as const)('uses %s schemas as-is', (mode) => {
 		expect(schemaAllowlist(mode, { schema: 'main', schemas: ['a', 'b'] })).toEqual(['a', 'b']);
 		expect(schemaAllowlist(mode, { schema: 'main' })).toEqual([]);
 	});

@@ -11,6 +11,7 @@ import { executeFabricQuery } from './fabric';
 import { executeDatabricksQuery } from './databricks';
 import { executePostgresQuery } from './postgres';
 import { executeMotherduckQuery } from './motherduck';
+import { executeDuckDBQuery } from './duckdb';
 import { managedTableNamesSql } from '@evidence/core/metadata/managed-catalog';
 import type { ConnectionConfig, QueryResult } from './types';
 
@@ -36,6 +37,8 @@ export async function executeQuery(sql: string, config: ConnectionConfig): Promi
 			return executePostgresQuery(sql, config);
 		case 'motherduck':
 			return executeMotherduckQuery(sql, config);
+		case 'duckdb':
+			return executeDuckDBQuery(sql, config);
 		default:
 			// Belt-and-braces: a future ConnectionConfig variant added without a
 			// matching branch should fail loudly here rather than silently
@@ -130,6 +133,7 @@ export function listTablesSql(config: ConnectionConfig | null): string {
 			const inList = schemas.map((s) => `'${s.replace(/'/g, "''")}'`).join(', ');
 			return `${base} WHERE table_schema IN (${inList}) ORDER BY name`;
 		}
+		case 'duckdb':
 		case 'motherduck': {
 			// DuckDB exposes a standard information_schema. Unqualify the default 'main'
 			// schema; qualify the rest — matches how unqualified names resolve. Exclude

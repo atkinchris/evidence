@@ -67,4 +67,14 @@ Fill in the placeholders with your own connection details. If `--warehouse` is o
 
     See the [BigQuery direct connector](/direct-connectors/bigquery) for the full field reference and the service-account setup steps.
   </Tab>
+  <Tab title="DuckDB">
+    ```yaml
+    type: duckdb
+    sources:
+      orders:
+        path: ./data/orders.parquet
+    ```
+
+    Install DuckDB on the machine running Evidence. Paths are relative to `connection.yaml`. See the [DuckDB direct connector](/direct-connectors/duckdb) for CSV, JSON, remote files and existing database configuration.
+  </Tab>
 </Tabs>

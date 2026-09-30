@@ -106,6 +106,7 @@ const CASES: Case[] = [
 	{ mode: 'fabric', keyReadsPerRow: 1, rows: standardRows, trailing: [result(viewNameRows())] },
 	{ mode: 'databricks', keyReadsPerRow: 1, rows: standardRows, trailing: [result(viewNameRows())] },
 	{ mode: 'motherduck', keyReadsPerRow: 1, rows: standardRows, trailing: [result(viewNameRows())] },
+	{ mode: 'duckdb', keyReadsPerRow: 1, rows: standardRows, trailing: [result(viewNameRows())] },
 	{ mode: 'postgres', keyReadsPerRow: 1, rows: standardRows, trailing: [] },
 	{ mode: 'cube', keyReadsPerRow: 1, rows: standardRows, trailing: [] },
 	// Already single-pass — the control that proves the bound measures the right thing.

@@ -1,5 +1,10 @@
 import type { z } from 'zod/v4';
 import {
+	duckdbBase,
+	duckdbConnectionSchema,
+	type DuckDBConnection
+} from './duckdb/connection-schema';
+import {
 	snowflakeBase,
 	snowflakeConnectionSchema,
 	type SnowflakeConnection
@@ -125,7 +130,9 @@ export {
 	cubeBase,
 	cubeConnectionSchema,
 	motherduckBase,
-	motherduckConnectionSchema
+	motherduckConnectionSchema,
+	duckdbBase,
+	duckdbConnectionSchema
 };
 export type {
 	SnowflakeConnection,
@@ -135,7 +142,8 @@ export type {
 	DatabricksConnection,
 	PostgresConnection,
 	CubeConnection,
-	MotherDuckConnection
+	MotherDuckConnection,
+	DuckDBConnection
 };
 
 export const CONNECTION_TYPES = [
@@ -146,7 +154,8 @@ export const CONNECTION_TYPES = [
 	'databricks',
 	'postgres',
 	'cube',
-	'motherduck'
+	'motherduck',
+	'duckdb'
 ] as const;
 export type ConnectionType = (typeof CONNECTION_TYPES)[number];
 
@@ -158,7 +167,8 @@ export type Connection =
 	| DatabricksConnection
 	| PostgresConnection
 	| CubeConnection
-	| MotherDuckConnection;
+	| MotherDuckConnection
+	| DuckDBConnection;
 
 const schemasByType = {
 	snowflake: snowflakeConnectionSchema,
@@ -168,7 +178,8 @@ const schemasByType = {
 	databricks: databricksConnectionSchema,
 	postgres: postgresConnectionSchema,
 	cube: cubeConnectionSchema,
-	motherduck: motherduckConnectionSchema
+	motherduck: motherduckConnectionSchema,
+	duckdb: duckdbConnectionSchema
 } as const;
 
 export function getConnectionSchema(type: ConnectionType): z.ZodType {

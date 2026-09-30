@@ -27,6 +27,7 @@ export function schemaAllowlist(
 		case 'fabric':
 		case 'databricks':
 		case 'motherduck':
+		case 'duckdb':
 			return config.schemas ?? [];
 		// Postgres-wire: opt in to more schemas, otherwise just the default one.
 		case 'postgres':

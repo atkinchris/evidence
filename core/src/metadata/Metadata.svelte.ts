@@ -234,7 +234,8 @@ export class Metadata {
 				this.#warehouseMode === 'databricks' ||
 				this.#warehouseMode === 'postgres' ||
 				this.#warehouseMode === 'cube' ||
-				this.#warehouseMode === 'motherduck')
+				this.#warehouseMode === 'motherduck' ||
+				this.#warehouseMode === 'duckdb')
 		) {
 			this.#loading = false;
 			return;
@@ -268,7 +269,7 @@ export class Metadata {
 			return await this.#loadCube();
 		}
 
-		if (this.#warehouseMode === 'motherduck') {
+		if (this.#warehouseMode === 'motherduck' || this.#warehouseMode === 'duckdb') {
 			return this.#loadMotherduck();
 		}
 

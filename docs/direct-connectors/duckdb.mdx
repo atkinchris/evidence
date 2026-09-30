@@ -1,0 +1,74 @@
+---
+title: 'DuckDB'
+description: 'Query Parquet, CSV, JSON and DuckDB databases on your Evidence server.'
+---
+
+The DuckDB direct connector runs SQL using DuckDB on the machine running Evidence. It exposes configured files as views, so reports can query Parquet, CSV and JSON without loading them into a separate warehouse. Queries use DuckDB SQL, including joins, aggregations and file-reading functions.
+
+## Setup
+
+Install the [DuckDB CLI](https://duckdb.org/docs/stable/clients/cli/overview) on your development machine and on your deployment server. The `duckdb` executable must be on `PATH`, or configured using `executable` below.
+
+Create a project with `evidence init my-project --warehouse duckdb`, or add a `connection.yaml` to an existing project:
+
+```yaml
+type: duckdb
+sources:
+  orders:
+    path: ./data/orders.parquet
+  customers:
+    path: ./data/customers.csv
+    format: csv
+  events:
+    path: ./data/events/*.json
+    format: json
+```
+
+Paths and globs are relative to the directory containing `connection.yaml`. Each source name is a view in the `main` schema and appears in the schema browser and CLI table listing. Each query opens an isolated DuckDB process and recreates these views; file updates are visible on the next uncached query.
+
+```sql
+SELECT customers.name, sum(orders.amount) AS revenue
+FROM orders
+JOIN customers USING (customer_id)
+GROUP BY ALL
+ORDER BY revenue DESC
+```
+
+## Configuration
+
+| Field | Description |
+| --- | --- |
+| `type` | Required. Set to `duckdb`. |
+| `database` | Existing DuckDB database file, relative to `connection.yaml`. Defaults to `:memory:`. File databases are opened read-only. |
+| `executable` | DuckDB executable name on `PATH`, or a path relative to `connection.yaml`. Defaults to `duckdb`. |
+| `sources` | Mapping of view names to file sources. Optional when querying a database or using file-reading functions directly. |
+| `sources.<name>.path` | File path, glob, URL, or a list of these. Required for each source. |
+| `sources.<name>.format` | `parquet` (default), `csv`, or `json`. CSV and JSON use DuckDB's automatic schema detection. |
+| `schemas` | Optional allowlist for the schema browser and table listing. This does not restrict SQL access. |
+
+To query an existing database:
+
+```yaml
+type: duckdb
+database: ./data/analytics.duckdb
+schemas: [main, reporting]
+```
+
+To combine several Parquet files in one view:
+
+```yaml
+type: duckdb
+sources:
+  orders:
+    path:
+      - ./data/orders-2025.parquet
+      - ./data/orders-2026.parquet
+```
+
+Remote public files can use HTTPS URLs. DuckDB automatically installs and loads its `httpfs` extension when needed, so the server needs network access and a writable DuckDB extension directory on first use. Private object storage uses DuckDB's own credential mechanisms. `${VAR}` environment references in `connection.yaml` are supported.
+
+## Deployment
+
+For self-hosting, install DuckDB in the same container or host as Evidence and mount or copy local data files into the project. Both `evidence dev` and `evidence serve` execute queries server-side; browsers receive query results.
+
+The connector accepts result-producing queries rather than database modification statements. Queries have a 30-second timeout and a 64 MiB output limit. An isolated process per query avoids shared session state, but adds process startup overhead. DuckDB SQL can access files and remote URLs available to the server, so the server's file permissions and network access determine what report authors can query.

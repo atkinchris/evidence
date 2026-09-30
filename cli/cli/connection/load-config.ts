@@ -21,6 +21,7 @@ import {
 	postgresConnectionSchema,
 	cubeConnectionSchema,
 	motherduckConnectionSchema,
+	duckdbConnectionSchema,
 	snowflakeConnectionSchema
 } from '@evidence/core/connectors/connection-schema';
 import { resolveSnowflakeCredentials } from '@evidence/core/connectors/snowflake/resolve';
@@ -165,6 +166,18 @@ export async function loadConnectionConfig(cwd: string): Promise<ConnectionConfi
 		const data = parseOrThrow(motherduckConnectionSchema, obj);
 		const credentials = await resolveMotherduckCredentials(data, { cwd });
 		return { type: 'motherduck', ...credentials };
+	}
+
+	if (obj.type === 'duckdb') {
+		const data = parseOrThrow(duckdbConnectionSchema, obj);
+		return {
+			...data,
+			cwd: path.resolve(cwd),
+			database: data.database === ':memory:' ? data.database : path.resolve(cwd, data.database),
+			executable: /[\\/]/.test(data.executable)
+				? path.resolve(cwd, data.executable)
+				: data.executable
+		};
 	}
 
 	throw new Error(
